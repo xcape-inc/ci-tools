@@ -106,4 +106,8 @@ echo "${GIT_DESCRIBE:-N/A}"
 # These are python compliant
 echo "${CUR_VERSION}"
 echo "${LONG_FORM_CUR_VERSION}"
+
+export CUR_VERSION
+export LONG_FORM_CUR_VERSION
+
 # TODO: give deb compliant version option
