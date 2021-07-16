@@ -104,7 +104,7 @@ echo "${GIT_DESCRIBE:-N/A}"
 #echo "${NEXT_TAG} ${PRE_RELEASE_SUFFIX} ${COMMIT_COUNT}"
 
 # These are python compliant
-echo "${CUR_VERSION}"
+#echo "${CUR_VERSION}"
 echo "${LONG_FORM_CUR_VERSION}"
 
 export CUR_VERSION
