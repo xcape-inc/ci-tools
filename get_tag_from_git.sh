@@ -55,11 +55,12 @@ else
   COMMIT_COUNT=$(git rev-list "${LAST_TAG_COMMIT}..HEAD" --count)
 fi
 
+PRE_RELEASE_SUFFIX=""
 # if the repo is dirty, there's never been a tag, or the commit-since-last-tag count is non-zero and branch is something other than master, main, or develop, is alpha
 if [[ '_DIRTY' == ${IS_DIRTY:-} || '' == ${RAW_LAST_TAG} || ("0" != "${COMMIT_COUNT}" && "main" != "${GIT_BRANCH}" && "master" != "${GIT_BRANCH}" && "develop" != "${GIT_BRANCH}") ]]; then
   PRE_RELEASE_SUFFIX='a'
 # if commit count is 0, we are on a release; do not se the value
-elif [[ "0" == "${GIT_BRANCH}" ]]; then
+elif [[ "0" == "${COMMIT_COUNT}" ]]; then
   :;
 # If this is the develop branch, this is beta
 elif [[ "develop" == "${GIT_BRANCH}" ]]; then
@@ -70,9 +71,9 @@ else
 fi
 
 # If there has never been a commit and the repo is not dirty (init only), this is a special case where the version should be 0.0.0
-# resulting in an effectiv version of v0.0.0a0, indicating this is alpha with no commits whatsoever
+# resulting in an effective version of v0.0.0a0, indicating this is alpha with no commits whatsoever
 if [[ '' == "${IS_DIRTY:-}" && '' == "${RAW_COMMIT_SHORT_SHA}" ]]; then
-  :;
+  PRE_RELEASE_SUFFIX='a'
 #  need to set this if PRE_RELEASE_SUFFIX has a value
 elif [[ "" != "${PRE_RELEASE_SUFFIX:-}" ]]; then
   LAST_PART_NEXT_TAG=$((${LAST_PART_LAST_TAG}+1))
@@ -82,7 +83,7 @@ fi
 # NEXT_TAG is set if this is a non-release commit; else the version is the same as the last tag
 CUR_VERSION=${NEXT_TAG:-${LAST_TAG}}
 # if this is a pre-release build, append the pre-release suffix and the commit number
-if [[ "" != "${PRE_RELEASE_SUFFIX}" ]]; then
+if [[ "" != "${PRE_RELEASE_SUFFIX:-}" ]]; then
   CUR_VERSION=${CUR_VERSION}${PRE_RELEASE_SUFFIX}${COMMIT_COUNT}
 fi
 
@@ -94,7 +95,7 @@ SANITIZED_GIT_BRANCH=${GIT_BRANCH}
 # The long form of version info for releas is the same as short
 LONG_FORM_CUR_VERSION=${CUR_VERSION}
 # If this is not a release, show more or less the second part of git describe combined with the short CUR_VERSION
-if [[ "" != "${PRE_RELEASE_SUFFIX}" ]]; then
+if [[ "" != "${PRE_RELEASE_SUFFIX:-}" ]]; then
   LONG_FORM_CUR_VERSION=${LONG_FORM_CUR_VERSION}+${COMMIT_COUNT}-g${COMMIT_SHORT_SHA}${IS_DIRTY:-}-${SANITIZED_GIT_BRANCH}
 fi
 
