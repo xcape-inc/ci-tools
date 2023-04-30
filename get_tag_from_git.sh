@@ -44,27 +44,9 @@ if [[ "" == "${LAST_TAG_COMMIT:-}" ]]; then
     COMMIT_COUNT=0
     # Note: all commits in history?
     # git rev-list --count --all
-  # otherwise, since there are no tags, it is all commits to head (count since first + 1)
+  # otherwise, since there are no tags, it is all commits to head
   else
-    # Note: It is possible to have multiple commits with 0 parents; this would occur if 2 or more
-    # unreleated repos or branches were merged as t6he history would include all such instances;
-    # as such, we must assume this is a list
-    FIRST_COMMIT_HASHES=$(git rev-list --max-parents=0 HEAD)
-    # Loop through all parentless commits and save the one with the biggest commit count to HEAD as
-    # the first, then use that for the commit count to head
-    # Start with blank and -1 so if a single commit is found, the count will be 0 from there to HEAD
-    # and it gets saved as the first commit
-    FIRST_COMMIT_HASH=""
-    COMMIT_COUNT=-1
-    for cur_first_commit_hash in ${FIRST_COMMIT_HASHES}; do
-      cur_commit_count=$(git rev-list "${cur_first_commit_hash}..HEAD" --count)
-      if [ "${cur_commit_count}" -gt "${COMMIT_COUNT}" ]; then
-        COMMIT_COUNT="${cur_commit_count}"
-        FIRST_COMMIT_HASH="${cur_first_commit_hash}"
-      fi
-    done
-
-    COMMIT_COUNT=$((${COMMIT_COUNT}+1))
+    COMMIT_COUNT=$(git rev-list HEAD --count)
   fi
 # Get the number of commits since the last tag if there has been a tag
 else
