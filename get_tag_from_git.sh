@@ -16,9 +16,10 @@ else
   GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 fi
 GIT_DESCRIBE=$((git describe --tags --dirty --long 2> /dev/null) || true)
-LAST_TAG_COMMIT=$(git rev-list --tags --no-walk --max-count=1)
+# Only release tags determine the version; coordination tags such as MPT-* do not.
+LAST_TAG_COMMIT=$(git rev-list --tags='v[0-9]*' --tags='[0-9]*' --no-walk --max-count=1)
 IS_DIRTY=$(git diff --quiet || echo '_DIRTY')
-RAW_LAST_TAG=$((git describe --tags "${LAST_TAG_COMMIT}" 2> /dev/null) || true)
+RAW_LAST_TAG=$((git describe --tags --match 'v[0-9]*' --match '[0-9]*' "${LAST_TAG_COMMIT}" 2> /dev/null) || true)
 LAST_TAG=${RAW_LAST_TAG:-v0.0.0}
 
 # Check the tag format; throw an error if its wrong
